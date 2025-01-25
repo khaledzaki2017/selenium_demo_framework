@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN" shutdownHook="disable">
+    <Appenders>
+        <!-- Console Appender for real-time logging -->
+        <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout pattern="[%-5level] %d{yyyy-MM-dd HH:mm:ss.SSS} [%t] - %msg%n" />
+        </Console>
+
+        <!-- Routing Appender for dynamic log file naming -->
+        <Routing name="RoutingAppender">
+            <Routes pattern="$${ctx:logFilename}">
+                <Route>
+                    <!-- RollingFile Appender for log rotation -->
+                    <RollingFile name="Rolling-${ctx:logFilename}"
+                                 fileName="logs/${ctx:logFilename}.log"
+                                 filePattern="logs/archive/${ctx:logFilename}-%d{yyyy-MM-dd}-%i.log.gz"
+                                 append="true">
+                        <PatternLayout pattern="[%-5level] %d{yyyy-MM-dd HH:mm:ss.SSS} [%t] - %msg%n" />
+                        <Policies>
+                            <!-- Rotate logs based on size (10 MB) -->
+                            <SizeBasedTriggeringPolicy size="10 MB" />
+                        </Policies>
+                        <!-- Keep up to 10 archived log files -->
+                        <DefaultRolloverStrategy max="10" />
+                    </RollingFile>
+                </Route>
+            </Routes>
+        </Routing>
+    </Appenders>
+
+    <Loggers>
+        <!-- Root logger configuration -->
+        <Root level="trace">
+            <AppenderRef ref="RoutingAppender" />
+            <AppenderRef ref="Console" />
+        </Root>
+    </Loggers>
+</Configuration>
